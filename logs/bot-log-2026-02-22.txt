@@ -1,0 +1,555 @@
+[00:16:57] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lanche 56"
+----------------------------------------
+[00:16:59] [AI] [+55 11 98350-4881] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "Lanche",
+      "amount": 56,
+      "category": "Alimentação"
+    }
+  ]
+}
+----------------------------------------
+[00:16:59] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Salvo: Lanche - R$ 56.00 (Alimentação)
+
+Compra p..."
+----------------------------------------
+[00:17:26] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Chocolates 40"
+----------------------------------------
+[00:17:27] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Falha no Gemini
+----------------------------------------
+[00:17:41] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Jantar 40"
+----------------------------------------
+[00:17:42] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Falha no Gemini
+----------------------------------------
+[00:28:14] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato..."
+----------------------------------------
+[00:28:14] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[00:28:14] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato pessoal..."
+----------------------------------------
+[00:28:14] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "👥 *Resumo Pessoal do Mês*
+
+👤 *Erick*
+   ⬆️ R$ 16..."
+----------------------------------------
+[00:28:15] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:15] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:15] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:15] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:15] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:16] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: Reaction send error
+new Error (<anonymous>:6:31)
+----------------------------------------
+[00:28:16] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Estacionamento 23,00"
+----------------------------------------
+[00:28:18] [AI] [+55 11 95340-1619] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "Estacionamento",
+      "amount": 23,
+      "category": "Transporte"
+    }
+  ]
+}
+----------------------------------------
+[00:28:18] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Salvo: Estacionamento - R$ 23.00 (Transporte)
+
+N..."
+----------------------------------------
+[00:28:40] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "gastei 50 na janta"
+----------------------------------------
+[00:28:41] [AI] [+55 11 98350-4881] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "Janta",
+      "amount": 50,
+      "category": "Alimentação"
+    }
+  ]
+}
+----------------------------------------
+[00:28:41] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Salvo: Janta - R$ 50.00 (Alimentação)
+
+Faça um c..."
+----------------------------------------
+[00:29:37] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "?"
+----------------------------------------
+[00:29:38] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_HELP
+> DADOS: {
+  "intent": "GET_HELP",
+  "helpCategory": "GERAL"
+}
+----------------------------------------
+[00:29:38] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤖 Olá! Eu entendo comandos por áudio e texto.
+
+Vo..."
+----------------------------------------
+[00:30:01] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "ajuda com relatorios"
+----------------------------------------
+[00:30:02] [ERROR] [+55 11 98350-4881] -> Erro grave na IA
+> DADOS: Falha no Gemini
+----------------------------------------
+[00:35:06] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "ajuda com relatorios"
+----------------------------------------
+[00:35:07] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_HELP
+> DADOS: {
+  "intent": "GET_HELP",
+  "helpCategory": "RELATORIOS"
+}
+----------------------------------------
+[00:35:07] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📋 *Como puxar relatórios:*
+
+Mande áudios ou texto..."
+----------------------------------------
+[00:35:15] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "qual o nosso saldo"
+----------------------------------------
+[00:35:17] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_BALANCE
+> DADOS: {
+  "intent": "GET_BALANCE"
+}
+----------------------------------------
+[00:35:17] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "💰 Saldo Atual do Grupo: R$ 1113.61..."
+----------------------------------------
+[00:35:29] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "grupo ver..."
+----------------------------------------
+[00:35:29] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "👥 *Membros do Grupo:*
+
+👤 +55 11 98350-4881 *( Er..."
+----------------------------------------
+[00:35:36] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "ajuda..."
+----------------------------------------
+[00:35:36] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤖 *Menu Completo de Comandos*
+
+💸 *Lançamentos*
+�..."
+----------------------------------------
+[13:09:14] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Ajuda com lista"
+----------------------------------------
+[13:09:16] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_HELP
+> DADOS: {
+  "intent": "GET_HELP",
+  "helpCategory": "LANCAMENTOS"
+}
+----------------------------------------
+[13:09:16] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤖 Olá! Eu entendo comandos por áudio e texto.
+
+Vo..."
+----------------------------------------
+[13:09:24] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista"
+----------------------------------------
+[13:09:26] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_REPORT
+> DADOS: {
+  "intent": "GET_REPORT"
+}
+----------------------------------------
+[13:09:26] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[13:09:43] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar arroz"
+----------------------------------------
+[13:09:45] [AI] [+55 11 98350-4881] -> Ação interpretada: UNKNOWN
+> DADOS: {
+  "intent": "UNKNOWN"
+}
+----------------------------------------
+[13:09:45] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤷‍♂️ A IA não conseguiu entender a ação desejada...."
+----------------------------------------
+[13:10:27] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar arroz 1"
+----------------------------------------
+[13:10:29] [AI] [+55 11 98350-4881] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "arroz",
+      "amount": 1,
+      "category": "Mercado"
+    }
+  ]
+}
+----------------------------------------
+[13:10:29] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Salvo: arroz - R$ 1.00 (Mercado)
+
+Revisão de ass..."
+----------------------------------------
+[13:10:39] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato..."
+----------------------------------------
+[13:10:39] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "[object Promise]..."
+----------------------------------------
+[13:10:47] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista"
+----------------------------------------
+[13:10:52] [AI] [+55 11 98350-4881] -> Ação interpretada: UNKNOWN
+> DADOS: {
+  "intent": "UNKNOWN"
+}
+----------------------------------------
+[13:10:52] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤷‍♂️ A IA não conseguiu entender a ação desejada...."
+----------------------------------------
+[13:19:11] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Ajuda com listas"
+----------------------------------------
+[13:19:12] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_HELP
+> DADOS: {
+  "intent": "GET_HELP",
+  "helpCategory": "LISTAS"
+}
+----------------------------------------
+[13:19:12] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🛒 *Ajuda — Listas de Compras*
+
+Comandos principai..."
+----------------------------------------
+[13:19:29] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar arroz 1"
+----------------------------------------
+[13:19:31] [AI] [+55 11 98350-4881] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "arroz",
+      "amount": 1,
+      "category": "Mercado"
+    }
+  ]
+}
+----------------------------------------
+[13:19:31] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Salvo: arroz - R$ 1.00 (Mercado)
+
+Mercado com fo..."
+----------------------------------------
+[13:20:04] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista"
+----------------------------------------
+[13:20:07] [AI] [+55 11 98350-4881] -> Ação interpretada: UNKNOWN
+> DADOS: {
+  "intent": "UNKNOWN"
+}
+----------------------------------------
+[13:20:07] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "🤷‍♂️ A IA não conseguiu entender a ação desejada...."
+----------------------------------------
+[13:20:11] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato..."
+----------------------------------------
+[13:20:11] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[13:40:56] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "extrato..."
+----------------------------------------
+[13:40:56] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[13:41:05] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado adicionar arroz 2"
+----------------------------------------
+[13:41:07] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: arroz (2)..."
+----------------------------------------
+[13:41:13] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[13:41:26] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_REPORT
+> DADOS: {
+  "intent": "GET_REPORT"
+}
+----------------------------------------
+[13:41:26] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[13:42:44] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[13:42:47] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de Erick: camisa (2)..."
+----------------------------------------
+[13:42:52] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[13:42:55] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_PERSONAL_REPORT
+> DADOS: {
+  "intent": "GET_PERSONAL_REPORT",
+  "personName": "Erick",
+  "month": "2026-02"
+}
+----------------------------------------
+[13:42:55] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "👤 *Extrato de Erick*
+
+1. 🔻 20/02 padaria [Alimen..."
+----------------------------------------
+[13:45:55] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[13:46:00] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (2) — +55 11 98350-48..."
+----------------------------------------
+[13:46:09] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick"
+----------------------------------------
+[13:46:13] [AI] [+55 11 98350-4881] -> Ação interpretada: GET_PERSONAL_REPORT
+> DADOS: {
+  "intent": "GET_PERSONAL_REPORT",
+  "personName": "Erick",
+  "month": "2026-02"
+}
+----------------------------------------
+[13:46:13] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "👤 *Extrato de Erick*
+
+1. 🔻 20/02 padaria [Alimen..."
+----------------------------------------
+[13:46:18] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[13:46:19] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick vazia.*..."
+----------------------------------------
+[13:46:31] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[13:46:33] [AI] [+55 11 98350-4881] -> Ação interpretada: ADD_EXPENSE
+> DADOS: {
+  "intent": "ADD_EXPENSE",
+  "expenses": [
+    {
+      "description": "camisa",
+      "amount": 2,
+      "category": "Compras"
+    }
+  ],
+  "personName": "Erick"
+}
+----------------------------------------
+[13:46:33] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Salvo: camisa - R$ 2.00 (Compras)
+
+Automatize a ..."
+----------------------------------------
+[13:50:45] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[13:50:47] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick vazia.*..."
+----------------------------------------
+[13:50:55] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[13:50:56] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (2) — +55 11 98350-48..."
+----------------------------------------
+[13:51:03] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[13:51:05] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de Erick: camisa (2)..."
+----------------------------------------
+[13:51:11] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[13:51:12] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick vazia.*..."
+----------------------------------------
+[14:12:12] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[14:12:13] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de Erick: camisa (2)..."
+----------------------------------------
+[14:12:19] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[14:12:20] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick:*
+1. camisa (2) — +55 11..."
+----------------------------------------
+[14:12:27] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[14:12:28] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de Erick: camisa (2)..."
+----------------------------------------
+[14:12:33] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[14:12:35] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick:*
+1. camisa (4) — +55 11..."
+----------------------------------------
+[14:12:40] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[14:12:41] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (2) — +55 11 98350-48..."
+----------------------------------------
+[14:29:16] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[14:29:17] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado vazia.*..."
+----------------------------------------
+[14:29:28] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado adicionar arroz"
+----------------------------------------
+[14:29:30] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: arroz..."
+----------------------------------------
+[14:29:39] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[14:29:40] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz — +55 11 98350-4881..."
+----------------------------------------
+[14:29:50] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick ver"
+----------------------------------------
+[14:29:51] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista pessoal - erick vazia.*..."
+----------------------------------------
+[14:29:59] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista pessoal erick adicionar camisa 2"
+----------------------------------------
+[14:30:00] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de Erick: camisa (2)..."
+----------------------------------------
+[14:30:08] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista casa adicionar centrifuga"
+----------------------------------------
+[14:30:09] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista casa: centrifuga..."
+----------------------------------------
+[14:31:47] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[14:31:48] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz — +55 11 98350-4881..."
+----------------------------------------
+[14:32:12] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar feijão"
+----------------------------------------
+[14:32:13] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: feijão..."
+----------------------------------------
+[14:32:22] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[14:32:24] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz — +55 11 98350-4881
+2..."
+----------------------------------------
+[14:32:45] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[14:32:46] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz — +55 11 98350-4881
+2..."
+----------------------------------------
+[14:33:25] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista casa ver"
+----------------------------------------
+[14:33:27] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista casa:*
+1. centrifuga — +55 11 98350-4881..."
+----------------------------------------
+[14:33:46] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal Erick ver"
+----------------------------------------
+[14:33:47] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista pessoal - Erick:*
+1. camisa (2) — +55 11..."
+----------------------------------------
+[14:34:16] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar arroz 2"
+----------------------------------------
+[14:34:18] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: arroz (2)..."
+----------------------------------------
+[14:34:24] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[14:34:26] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (3) — +55 11 98350-48..."
+----------------------------------------
+[14:58:12] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Ajuda com lista"
+----------------------------------------
+[14:58:14] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: viewVerb is not defined
+----------------------------------------
+[14:58:22] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Ajuda com a lista"
+----------------------------------------
+[14:58:24] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: viewVerb is not defined
+----------------------------------------
+[15:07:11] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[15:07:13] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (3) — +55 11 98350-48..."
+----------------------------------------
+[15:07:19] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato..."
+----------------------------------------
+[15:07:19] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📊 *Extrato (02/2026):*
+
+1. 🔻 20/02 padaria [Alim..."
+----------------------------------------
+[15:07:31] [INFO] [+55 11 98350-4881] -> 💬 Enviou texto: "Extrato gráfico..."
+----------------------------------------
+[15:07:33] [INFO] [+55 11 98350-4881] -> 📤 Bot enviou: Imagem de Gráfico
+----------------------------------------
+[16:38:34] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[16:38:35] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (3) — +55 11 98350-48..."
+----------------------------------------
+[16:39:59] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado adicionar arroz 2"
+----------------------------------------
+[16:40:01] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: arroz (2)..."
+----------------------------------------
+[16:40:08] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[16:40:10] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (2) — +55 11 98350-48..."
+----------------------------------------
+[16:42:25] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado adicionar arroz 2"
+----------------------------------------
+[16:42:27] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: arroz (2)..."
+----------------------------------------
+[16:42:34] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[16:42:36] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (6) — +55 11 98350-48..."
+----------------------------------------
+[16:44:24] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[16:44:26] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (6) — +55 11 98350-48..."
+----------------------------------------
+[16:45:48] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[16:45:50] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (6) — +55 11 98350-48..."
+----------------------------------------
+[16:46:46] [INFO] [+55 11 98350-4881] -> 🎙️ Enviou para IA (Texto): "lista mercado ver"
+----------------------------------------
+[16:46:48] [INFO] [+55 11 98350-4881] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (6) — Erick..."
+----------------------------------------
+[16:47:07] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado adicionar feijão 2"
+----------------------------------------
+[16:47:09] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Adicionados à lista mercado: feijão (2)..."
+----------------------------------------
+[16:47:15] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Ajuda com lista"
+----------------------------------------
+[16:47:17] [ERROR] [+55 11 95340-1619] -> Erro grave na IA
+> DADOS: viewVerb is not defined
+----------------------------------------
+[16:47:32] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal gabs tenis 1"
+----------------------------------------
+[16:47:33] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Adicionados à lista pessoal de gabs: tenis..."
+----------------------------------------
+[16:48:00] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista casa adicionar lavadora"
+----------------------------------------
+[16:48:01] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "✅ Adicionados à lista casa: lavadora..."
+----------------------------------------
+[16:48:23] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista mercado ver"
+----------------------------------------
+[16:48:25] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista mercado:*
+1. arroz (6) — Erick
+2. feijão..."
+----------------------------------------
+[16:48:40] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal Gabs ver"
+----------------------------------------
+[16:48:41] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista pessoal - Gabs:*
+1. tenis — Gabs..."
+----------------------------------------
+[16:48:51] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista casa ver"
+----------------------------------------
+[16:48:52] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista casa:*
+1. lavadora — Gabs..."
+----------------------------------------
+[16:49:25] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: Ajuda Listas (atalho)
+----------------------------------------
+[16:49:42] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal ver"
+----------------------------------------
+[16:49:43] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista pessoal - ver vazia.*..."
+----------------------------------------
+[16:49:56] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal Erick"
+----------------------------------------
+[16:49:57] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista pessoal - Erick vazia.*..."
+----------------------------------------
+[16:50:05] [INFO] [+55 11 95340-1619] -> 🎙️ Enviou para IA (Texto): "Lista pessoal Gabs"
+----------------------------------------
+[16:50:07] [INFO] [+55 11 95340-1619] -> 📤 Bot respondeu: "📝 *Lista pessoal - Gabs:*
+1. tenis — Gabs..."
+----------------------------------------

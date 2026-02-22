@@ -1,0 +1,29 @@
+{
+  "name": "botzap",
+  "version": "2.0.0",
+  "description": "Bot Financeiro Familiar para WhatsApp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "force-login": "node index.js --force-login"
+  },
+  "dependencies": {
+    "@google/genai": "^1.42.0",
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^11.10.0",
+    "chart.js-image": "^6.1.3",
+    "express": "^5.2.1",
+    "express-basic-auth": "^1.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^3.0.3",
+    "proxy-agent": "^6.5.0",
+    "qrcode-terminal": "^0.12.0",
+    "sqlite3": "^5.1.7",
+    "whatsapp-web.js": "^1.34.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
