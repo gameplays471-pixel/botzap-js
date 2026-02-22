@@ -1,4 +1,4 @@
-const API_KEY = 'AIzaSyA9brN_U1qkO8-uY36JDtNDo34tU4cGkOw';
+const API_KEY = '';
 
 async function extractTransactions(text, audioBase64, mimeType) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
