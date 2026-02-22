@@ -1,21 +1,55 @@
-const { ensureUserExists } = require('../db/users');
-const db = require('../db/connection');
-const { processMessage, normalizePhone } = require('../execution/messageProcessor');
-const { MessageMedia } = require('whatsapp-web.js');
-const fs = require('fs');
-const { appendLog } = require('../utils/logger'); // <-- Nosso novo logger!
+const { ensureUserExists, addMember }    = require('../db/users');
+const db                                  = require('../db/connection');
+const { processMessage, normalizePhone }  = require('../execution/messageProcessor');
+const { MessageMedia }                    = require('whatsapp-web.js');
+const fs                                  = require('fs');
+const { appendLog }                       = require('../utils/logger');
 
-const { extractTransactions, parseShoppingItems } = require('../services/gemini');
-const { addTransaction, getBalance, getReport } = require('../db/transactions');
-const { getPersonalReport, deleteLatestTransactionByContext, getCategoryBreakdown } = require('../db/transactionsAdvanced');
-const { getSavingsTip } = require('../execution/savingsAdvisor');
+const { extractTransactions }             = require('../services/gemini');
+const { addTransaction, getBalance, getReport, getDetailedExtract } = require('../db/transactions');
+const { getPersonalReport, deleteLatestTransactionByContext,
+        getCategoryBreakdown, getGroupMembersWithNames } = require('../db/transactionsAdvanced');
+const { getSavingsTip }                   = require('../execution/savingsAdvisor');
+const { generatePieChartImage }           = require('../utils/chartGenerator');
+const shopping                            = require('../db/shoppingLists');
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 function checkUserExists(userId) {
     try { return !!db.prepare('SELECT phone_number FROM users WHERE phone_number = ?').get(userId); } catch (e) { return false; }
 }
 
+function formatShoppingList(groupId, target, person = null) {
+    const { items } = shopping.getListItems(groupId, target, person);
+    const label = `${target}${person ? ' - ' + person : ''}`;
+    if (!items || items.length === 0) return `📝 *Lista ${label} vazia.*`;
+
+    const map = new Map();
+    for (const it of items) {
+        const key = (it.description || '').trim().toLowerCase();
+        const addedByName = it.added_name || it.added_by;
+        if (!map.has(key)) {
+            map.set(key, { description: it.description.trim(), quantity: it.quantity || 1, added_by: addedByName });
+        } else {
+            const cur = map.get(key);
+            cur.quantity = (cur.quantity || 0) + (it.quantity || 1);
+            if (!cur.added_by && addedByName) cur.added_by = addedByName;
+        }
+    }
+
+    const lines = Array.from(map.values()).map((it, i) =>
+        `${i + 1}. ${it.description}${it.quantity > 1 ? ' (' + it.quantity + ')' : ''}${it.added_by ? ' — ' + it.added_by : ''}`
+    );
+    return `📝 *Lista ${label}:*\n` + lines.join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// handleMessage — ponto de entrada principal
+// Toda mensagem (texto ou áudio) passa pela IA antes de qualquer coisa.
+// ─────────────────────────────────────────────────────────────────────────────
 async function handleMessage(client, msg) {
-    if (msg.from === 'status@broadcast' || msg.from.endsWith('@g.us')) return;      
+    if (msg.from === 'status@broadcast' || msg.from.endsWith('@g.us')) return;
     if (msg.type !== 'chat' && msg.type !== 'ptt' && msg.type !== 'audio') return;
 
     const text = msg.body?.trim() || '';
@@ -25,12 +59,13 @@ async function handleMessage(client, msg) {
         if (contact && contact.number) rawNumber = contact.number + '@c.us';
     } catch (e) {}
 
-    const userId = normalizePhone(rawNumber);
+    const userId   = normalizePhone(rawNumber);
     const textLower = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
+    // ── Ativação / Desativação (comandos fixos de sistema) ────────────────────
     if (textLower === 'iniciar bot financeiro') {
         ensureUserExists(userId);
-        await msg.reply('✅ Olá! Bot Financeiro Ativado. Mande áudios ou textos com comandos ou gastos!');
+        await msg.reply('✅ Olá! Bot Financeiro Ativado. Mande áudios ou textos com o que você precisa!');
         appendLog('INFO', userId, 'Usuário Ativou o Bot');
         return;
     }
@@ -40,310 +75,236 @@ async function handleMessage(client, msg) {
         appendLog('INFO', userId, 'Usuário Desativou o Bot');
         return;
     }
-    
-    if (!checkUserExists(userId)) return; 
 
-    // Atalho: ajuda sobre Listas via linguagem natural
-    const listHelpPatterns = /me ajude com as listas|quais comandos das listas|ajuda listas|me ajude com lista|quais comandos lista|ajuda lista/i;
-    if (listHelpPatterns.test(text)) {
-        const listHelp = (
-            '🛒 *Ajuda — Listas de Compras*\n\n' +
-            'Comandos principais:\n' +
-            '• `Lista mercado adicionar <item> [quantidade]` — ex: Lista mercado adicionar Arroz 2\n' +
-            '• `Lista mercado ver` — mostra itens do mercado\n' +
-            '• `Lista mercado remover <n>` — remove item pelo índice\n' +
-            '• `Lista mercado limpar` — limpa a lista do mercado\n\n' +
-            'Listas pessoais:\n' +
-            '• `Lista pessoal adicionar <Nome> <item> [qtd]` — ex: Lista pessoal adicionar Maria Leite 2\n' +
-            '• `Lista pessoal ver <Nome>` — exibe lista da pessoa\n\n' +
-            'Você também pode usar linguagem natural, por exemplo:\n' +
-            '"adicione pra mim na lista de mercado pra eu comprar 1 arroz e 1 feijão"\n\n' +
-            'Quer que eu adicione algo agora?'
-        );
-        appendLog('INFO', userId, '📤 Bot respondeu: Ajuda Listas (atalho)');
-        await msg.reply(listHelp);
-        return;
-    }
+    if (!checkUserExists(userId)) return;
+    if (!text && !msg.hasMedia)   return;
 
-    // --- MODO: COMANDO DE TEXTO SIMPLES ---
-        // --- MODO: COMANDO DE TEXTO SIMPLES ---
-    const isCommand = /^(relat[oó]rio|extrato|xtrato|saldo|categorias|grupo|dica|remover|editar)/i.test(textLower) || textLower === 'ajuda' || textLower === 'menu';
-
-    if (isCommand && !msg.hasMedia) {
-        appendLog('INFO', userId, `💬 Enviou texto: "${text.substring(0, 50)}..."`);
-        
-        const answer = await processMessage(userId, text);
-        if (answer) {
-            // Se a resposta for uma Promise (algum handler retornou incorretamente), aguarda-a
-            if (answer && typeof answer.then === 'function') {
-                try { answer = await answer; } catch (e) { answer = String(e.message); }
-            }
-
-            if (typeof answer === 'object' && answer.type === 'chart') {
-                const { generatePieChartImage } = require('../utils/chartGenerator');
-                const { monthToLabel } = require('../utils/monthParser');
-                try {
-                    const imagePath = await generatePieChartImage(answer.data, `Gastos - ${monthToLabel(answer.month)}`);
-                    const media = MessageMedia.fromFilePath(imagePath);
-                    await msg.reply(media, undefined, { caption: '📊 Gráfico gerado!' });
-                    appendLog('INFO', userId, '📤 Bot enviou: Imagem de Gráfico');
-                    setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 5000);
-                } catch (e) {
-                    appendLog('ERROR', userId, 'Falha ao gerar gráfico', e.message);
-                    await msg.reply(`❌ Erro no gráfico: ${e.message}`);
-                }
-                } else {
-                    // Se for objeto não-chart, transforma em texto amigável
-                    let out = answer;
-                    if (typeof out === 'object') {
-                        try { out = JSON.stringify(out); } catch (_) { out = String(out); }
-                    }
-                    appendLog('INFO', userId, `📤 Bot respondeu: "${String(out).substring(0, 50)}..."`);
-                    await msg.reply(out);
-                }
-        }
-        return;
-    }
-
-    // --- MODO: INTELIGÊNCIA ARTIFICIAL (ÁUDIO OU TEXTO NATURAL) ---
+    // ── Toda mensagem passa pela IA ───────────────────────────────────────────
     try {
         await msg.react('🧠');
-        
+
         const inputType = msg.hasMedia ? 'Áudio' : 'Texto';
-        appendLog('INFO', userId, `🎙️ Enviou para IA (${inputType}): "${text.substring(0, 50)}"`);
+        appendLog('INFO', userId, `🧠 IA (${inputType}): "${text.substring(0, 60)}"`);
 
         let audioData = null, mimeType = null;
         if (msg.hasMedia && (msg.type === 'ptt' || msg.type === 'audio')) {
             const media = await msg.downloadMedia();
-            audioData = media.data; mimeType = media.mimetype;
+            audioData = media.data;
+            mimeType  = media.mimetype;
         }
 
         if (!text && !audioData) { await msg.react(''); return; }
 
-        // Se a mensagem aparenta falar sobre listas, tente interpretar como lista antes de chamar o Gemini
-        const listWords = /\blista\b|\bmercado\b|\bcasa\b|\bpessoal\b|\blista(s)?\b/i;
-        if (listWords.test(textLower)) {
-            try {
-                const parsedList = await parseShoppingItems(text);
-                if (parsedList && Array.isArray(parsedList.items) && parsedList.items.length) {
-                    const shopping = require('../db/shoppingLists');
-                    const [groupId] = ensureUserExists(userId);
-                    const target = (parsedList.target || 'mercado').toLowerCase();
-                    const person = parsedList.person || null;
-                    const added = [];
-                    for (const it of parsedList.items) {
-                        const qty = parseInt(it.quantity || 1, 10) || 1;
-                        const res = shopping.addItemToList(groupId, target === 'pessoal' ? 'pessoal' : (target === 'casa' ? 'casa' : 'mercado'), it.description, qty, normalizePhone(userId), person);
-                        added.push(`${it.description}${qty>1? ' ('+qty+')':''}${res && res.duplicate ? ' (já existente)' : ''}`);
-                    }
-                    const replyTextList = `✅ Adicionados à lista ${target}${person? ' de '+person: ''}: ${added.join(', ')}`;
-                    appendLog('INFO', userId, `📤 Bot respondeu: "${replyTextList.substring(0,50)}..."`);
-                    await msg.reply(replyTextList);
-                    await msg.react('✅');
-                    return;
-                }
-
-                // Se o parser não retornou itens, mas a mensagem parece pedir para VER a lista, mostramos a lista
-                const viewVerb = /\b(ver|mostrar|listar)\b/i;
-                if (viewVerb.test(textLower) || /^lista\s+\w+/i.test(textLower)) {
-                    try {
-                        const shopping = require('../db/shoppingLists');
-                        const [groupId] = ensureUserExists(userId);
-                        let target = 'mercado';
-                        if (/\bpessoal\b|\bindividual\b/i.test(textLower)) target = 'pessoal';
-                        else if (/\bcasa\b|\blar\b/i.test(textLower)) target = 'casa';
-                        else if (/\bmercado\b|\bsupermercado\b/i.test(textLower)) target = 'mercado';
-
-                        let person = null;
-                        if (target === 'pessoal') {
-                            const m = text.match(/pessoal\s+(?:ver\s+)?([a-zA-ZÀ-ú0-9_\-]+)/i);
-                            if (m) person = m[1];
-                        }
-
-                        const { items } = shopping.getListItems(groupId, target, person);
-                        let replyTextList;
-                        if (!items || items.length === 0) replyTextList = `📝 *Lista ${target}${person? ' - '+person : ''} vazia.*`;
-                        else {
-                            const map = new Map();
-                            for (const it of items) {
-                                const key = (it.description || '').trim().toLowerCase();
-                                const addedByName = it.added_name || it.added_by;
-                                if (!map.has(key)) map.set(key, { description: it.description.trim(), quantity: it.quantity || 1, added_by: addedByName });
-                                else { const cur = map.get(key); cur.quantity = (cur.quantity || 0) + (it.quantity || 1); if (!cur.added_by && addedByName) cur.added_by = addedByName; }
-                            }
-                            const consolidated = Array.from(map.values());
-                            const lines = consolidated.map((it, i) => `${i+1}. ${it.description}${it.quantity && it.quantity>1 ? ' ('+it.quantity+')' : ''}${it.added_by ? ' — ' + it.added_by : ''}`);
-                            replyTextList = `📝 *Lista ${target}${person? ' - '+person : ''}:*\n` + lines.join('\n');
-                        }
-                        appendLog('INFO', userId, `📤 Bot respondeu: "${replyTextList.substring(0,50)}..."`);
-                        await msg.reply(replyTextList);
-                        await msg.react('✅');
-                        return;
-                    } catch (e) { /* segue para Gemini */ }
-                }
-            } catch (e) { /* falha no parser, segue para Gemini */ }
-        }
-
-        // Chama o Google Gemini para intents financeiras
         const result = await extractTransactions(text, audioData, mimeType);
+        appendLog('AI', userId, `Intent: ${result.intent}`, result);
 
-        // Se a mensagem parece pedir PARA VER a lista (ex: "lista mercado ver"), priorize exibir a lista
-        if (listWords.test(textLower) && viewVerb.test(textLower)) {
-            try {
-                const shopping = require('../db/shoppingLists');
-                const [groupId] = ensureUserExists(userId);
-                let target = 'mercado';
-                if (/\bpessoal\b|\bindividual\b/i.test(textLower)) target = 'pessoal';
-                else if (/\bcasa\b|\blar\b/i.test(textLower)) target = 'casa';
-                else if (/\bmercado\b|\bsupermercado\b/i.test(textLower)) target = 'mercado';
-
-                // tenta extrair nome da pessoa (para listas pessoais)
-                let person = null;
-                if (target === 'pessoal') {
-                    const m = text.match(/pessoal\s+(?:ver\s+)?([a-zA-ZÀ-ú0-9_\-]+)/i);
-                    if (m) person = m[1];
-                }
-
-                const { items } = shopping.getListItems(groupId, target, person);
-                let replyTextList;
-                if (!items || items.length === 0) replyTextList = `📝 *Lista ${target}${person? ' - '+person : ''} vazia.*`;
-                else {
-                    // Consolida itens similar ao messageProcessor
-                    const map = new Map();
-                    for (const it of items) {
-                        const key = (it.description || '').trim().toLowerCase();
-                        const addedByName = it.added_name || it.added_by;
-                        if (!map.has(key)) map.set(key, { description: it.description.trim(), quantity: it.quantity || 1, added_by: addedByName });
-                        else { const cur = map.get(key); cur.quantity = (cur.quantity || 0) + (it.quantity || 1); if (!cur.added_by && addedByName) cur.added_by = addedByName; }
-                    }
-                    const consolidated = Array.from(map.values());
-                    const lines = consolidated.map((it, i) => `${i+1}. ${it.description}${it.quantity && it.quantity>1 ? ' ('+it.quantity+')' : ''}${it.added_by ? ' — ' + it.added_by : ''}`);
-                    replyTextList = `📝 *Lista ${target}${person? ' - '+person : ''}:*\n` + lines.join('\n');
-                }
-                appendLog('INFO', userId, `📤 Bot respondeu: "${replyTextList.substring(0,50)}..."`);
-                await msg.reply(replyTextList);
-                await msg.react('✅');
-                return;
-            } catch (e) {
-                // silenciosamente segue para o fluxo normal
-            }
-        }
-        
-        // Log detalhado com o pensamento interno da IA no arquivo
-        appendLog('AI', userId, `Ação interpretada: ${result.intent}`, result);
-
-        let replyText = '';
+        const [groupId] = ensureUserExists(userId);
+        let replyText   = '';
 
         switch (result.intent) {
-            case 'ADD_EXPENSE':
+
+            // ── Gastos ────────────────────────────────────────────────────────
+            case 'ADD_EXPENSE': {
                 if (!result.expenses || result.expenses.length === 0) {
-                    replyText = '❌ Nenhum gasto identificado.';
+                    replyText = '❌ Nenhum gasto identificado. Ex: _"Almoço 25"_ ou _"Gastei 45 no mercado"_';
                     break;
                 }
-                let resList = [];
+                const resList = [];
                 for (const exp of result.expenses) {
-                    resList.push(addTransaction(userId, exp.description, exp.amount, exp.category, 1, false));
+                    resList.push(addTransaction(userId, exp.description, exp.amount, exp.category || 'Outros', 1, false));
                 }
                 resList.push('\n' + getSavingsTip());
                 replyText = resList.join('\n');
                 break;
+            }
 
+            // ── Relatórios ────────────────────────────────────────────────────
             case 'GET_REPORT':
-                replyText = getReport(userId, result.month);
+                replyText = getReport(userId, result.month || null);
+                break;
+
+            case 'GET_DETAILED_EXTRACT':
+                replyText = getDetailedExtract(userId);
                 break;
 
             case 'GET_PERSONAL_REPORT':
-                replyText = getPersonalReport(userId, result.personName, result.month);
-                break;
-
-            case 'DELETE_EXPENSE':
-                replyText = deleteLatestTransactionByContext(userId, result.deleteQuery, result.deleteAmount);
+                replyText = getPersonalReport(userId, result.personName, result.month || null);
                 break;
 
             case 'GET_BALANCE':
                 replyText = `💰 Saldo Atual do Grupo: R$ ${getBalance(userId).toFixed(2)}`;
                 break;
 
-            case 'GET_CHART':
-                const [groupId] = ensureUserExists(userId);
-                const dataChart = getCategoryBreakdown(groupId, result.month);
-                if (Object.keys(dataChart).length === 0) {
-                    replyText = `📊 Nenhuma saída registrada para o período.`;
+            // ── Gráfico ───────────────────────────────────────────────────────
+            case 'GET_CHART': {
+                const dataChart = getCategoryBreakdown(groupId, result.month || null);
+                if (!dataChart || Object.keys(dataChart).length === 0) {
+                    replyText = '📊 Nenhuma saída registrada para o período.';
                 } else {
-                    const { generatePieChartImage } = require('../utils/chartGenerator');
-                    const imagePath = await generatePieChartImage(dataChart, `Gráfico Mensal`);
-                    const media = MessageMedia.fromFilePath(imagePath);
-                    await msg.reply(media, undefined, { caption: '📊 Gráfico de Gastos' });
-                    appendLog('INFO', userId, '📤 Bot enviou: Imagem de Gráfico (via IA)');
+                    const imagePath = await generatePieChartImage(dataChart, 'Gráfico de Gastos');
+                    const media    = MessageMedia.fromFilePath(imagePath);
+                    await msg.reply(media, undefined, { caption: '📊 Gráfico de Gastos por Categoria' });
+                    appendLog('INFO', userId, '📤 Gráfico enviado');
                     setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 5000);
                     await msg.react('✅');
-                    return; 
+                    return;
                 }
                 break;
-            case 'GET_HELP':
-                if (result.helpCategory === 'GRUPOS') {
-                    replyText = '👥 *Como gerenciar a família:*\n\n' +
-                                '1️⃣ Para adicionar alguém (a pessoa manda os gastos do celular dela e cai na mesma conta):\n' +
-                                '👉 `Grupo adicionar 11999999999`\n\n' +
-                                '2️⃣ Para dar um nome bonitinho a esse número (Pra sair no extrato pessoal):\n' +
-                                '👉 `Grupo renomear 11999999999 para Esposa`\n\n' +
-                                '3️⃣ Para ver quem está no grupo:\n' +
-                                '👉 `Grupo ver`';
-                } 
-                else if (result.helpCategory === 'LISTAS') {
-                    replyText = '🛒 *Ajuda — Listas de Compras*\n\n' +
-                                'Comandos principais:\n' +
-                                '• `Lista mercado adicionar <item> [quantidade]` — ex: Lista mercado adicionar Arroz 2\n' +
-                                '• `Lista mercado ver` — mostra itens do mercado\n' +
-                                '• `Lista mercado remover <n>` — remove item pelo índice\n' +
-                                '• `Lista mercado limpar` — limpa a lista do mercado\n\n' +
-                                'Listas pessoais:\n' +
-                                '• `Lista pessoal adicionar <Nome> <item> [qtd]` — ex: Lista pessoal adicionar Maria Leite 2\n' +
-                                '• `Lista pessoal ver <Nome>` — exibe lista da pessoa\n\n' +
-                                'Você também pode usar linguagem natural, por exemplo:\n' +
-                                '"adicione pra mim na lista de mercado pra eu comprar 1 arroz e 1 feijão"\n\n' +
-                                'Quer que eu adicione algo agora?';
-                }
-                else if (result.helpCategory === 'WEB') {
-                    replyText = '🌐 *Como acessar o Painel na Internet:*\n\n' +
-                                'Você precisa criar um Usuário e Senha aqui no Zap para logar no site.\n\n' +
-                                '👉 1º Envie: `Grupo nome Família`\n' +
-                                '👉 2º Envie: `Grupo senha 123456`\n' +
-                                '👉 3º Se errar o nome, use: `Grupo renomeargrupo NovoNome`\n\n' +
-                                'Depois acesse o link gerado pelo Ngrok e coloque os dados!';
-                } 
-                else if (result.helpCategory === 'RELATORIOS') {
-                    replyText = '📋 *Como puxar relatórios:*\n\n' +
-                                'Mande áudios ou textos como:\n' +
-                                '- _"Me mostre o extrato deste mês"_\n' +
-                                '- _"Extrato grafico"_\n' +
-                                '- _"Quanto o Erick gastou no mês passado?"_\n' +
-                                '- _"Qual o nosso saldo?"_';
-                } 
-                else {
-                    replyText = '🤖 Olá! Eu entendo comandos por áudio e texto.\n\n' +
-                                'Você pode me pedir:\n' +
-                                '🔹 *Ajuda com Grupos* (Adicionar familiares)\n' +
-                                '🔹 *Ajuda com Web* (Login do painel)\n' +
-                                '🔹 *Ajuda com Relatórios* (Gráficos e extratos)\n\n' +
-                                'Ou mande a palavra `Ajuda` para ver a lista de códigos tradicionais.';
+            }
+
+            // ── Remover Lançamento ────────────────────────────────────────────
+            case 'DELETE_EXPENSE':
+                replyText = deleteLatestTransactionByContext(userId, result.deleteQuery, result.deleteAmount);
+                break;
+
+            // ── Grupo ─────────────────────────────────────────────────────────
+            case 'GET_GROUP_MEMBERS':
+                replyText = getGroupMembersWithNames(userId);
+                break;
+
+            case 'ADD_MEMBER':
+                if (!result.newMemberPhone) {
+                    replyText = '❌ Não identifiquei o número. Ex: _"Adiciona o 11999998888 ao grupo"_';
+                } else {
+                    replyText = addMember(userId, normalizePhone(result.newMemberPhone));
                 }
                 break;
 
-            default:
-                replyText = '🤷‍♂️ A IA não conseguiu entender a ação desejada.';
+            // ── Listas de Compras ─────────────────────────────────────────────
+            case 'ADD_TO_LIST': {
+                const target = (result.listTarget || 'mercado').toLowerCase();
+                const person = result.listPerson || null;
+                if (!result.listItems || result.listItems.length === 0) {
+                    replyText = '❌ Não identifiquei os itens. Ex: _"Adiciona azeitonas e maionese na lista do mercado"_';
+                    break;
+                }
+                const added = [];
+                for (const it of result.listItems) {
+                    const qty = parseInt(it.quantity || 1, 10) || 1;
+                    const res = shopping.addItemToList(groupId, target, it.description, qty, normalizePhone(userId), person);
+                    added.push(`${it.description}${qty > 1 ? ' (' + qty + ')' : ''}${res && res.duplicate ? ' (já na lista)' : ''}`);
+                }
+                replyText = `✅ Adicionado à lista *${target}*${person ? ' de ' + person : ''}:\n${added.map(i => '• ' + i).join('\n')}`;
+                break;
+            }
+
+            case 'VIEW_LIST': {
+                const target = (result.listTarget || 'mercado').toLowerCase();
+                const person = result.listPerson || null;
+                replyText = formatShoppingList(groupId, target, person);
+                break;
+            }
+
+            case 'REMOVE_FROM_LIST': {
+                const target = (result.listTarget || 'mercado').toLowerCase();
+                const person = result.listPerson || null;
+                const idx    = result.listIndex;
+                if (!idx) {
+                    replyText = '❌ Diga o número do item para remover. Ex: _"Remove o item 2 da lista do mercado"_';
+                    break;
+                }
+                const ok = shopping.removeItemByIndex(groupId, target, idx, person);
+                replyText = ok
+                    ? `✅ Item ${idx} removido da lista *${target}*.`
+                    : '❌ Item não encontrado na lista.';
+                break;
+            }
+
+            case 'CLEAR_LIST': {
+                const target = (result.listTarget || 'mercado').toLowerCase();
+                shopping.clearList(groupId, target);
+                replyText = `✅ Lista *${target}* limpa com sucesso!`;
+                break;
+            }
+
+            // ── Ajuda ─────────────────────────────────────────────────────────
+            case 'GET_HELP':
+                switch (result.helpCategory) {
+                    case 'GRUPOS':
+                        replyText =
+                            '👥 *Como gerenciar o grupo/família:*\n\n' +
+                            '• _"Adiciona o 11999999999 ao grupo"_\n' +
+                            '• `Grupo renomear 11999999999 para Esposa`\n' +
+                            '• _"Mostre as pessoas do meu grupo"_\n' +
+                            '• `Grupo retirar 11999999999`';
+                        break;
+                    case 'LISTAS':
+                        replyText =
+                            '🛒 *Listas de Compras — fale naturalmente:*\n\n' +
+                            '• _"Adiciona azeitonas e maionese na lista do mercado"_\n' +
+                            '• _"Me mostra a lista do mercado"_\n' +
+                            '• _"Remove o item 2 da lista de casa"_\n' +
+                            '• _"Limpa a lista do mercado"_\n\n' +
+                            'Lista pessoal:\n' +
+                            '• _"Adiciona leite na lista da Maria"_\n' +
+                            '• _"Mostra a lista de compras da Maria"_';
+                        break;
+                    case 'RELATORIOS':
+                        replyText =
+                            '📋 *Relatórios — fale naturalmente:*\n\n' +
+                            '• _"Me mostre o extrato de fevereiro"_\n' +
+                            '• _"Me manda o extrato detalhado"_\n' +
+                            '• _"Manda o gráfico de gastos"_\n' +
+                            '• _"Quanto o Erick gastou em janeiro?"_\n' +
+                            '• _"Qual o nosso saldo?"_\n' +
+                            '• _"Apaga a padaria do extrato"_';
+                        break;
+                    case 'WEB':
+                        replyText =
+                            '🌐 *Painel Web:*\n\n' +
+                            '👉 `Grupo nome Família Silva`\n' +
+                            '👉 `Grupo senha 123456`\n' +
+                            '👉 `Grupo renomeargrupo NovoNome` (para alterar)\n\n' +
+                            'Depois acesse o link do Ngrok!';
+                        break;
+                    default:
+                        replyText =
+                            '🤖 Pode falar comigo naturalmente, por áudio ou texto!\n\n' +
+                            '💸 _"Gastei 45 reais no mercado"_\n' +
+                            '📋 _"Me mostre o extrato de fevereiro"_\n' +
+                            '📊 _"Me manda o gráfico de gastos"_\n' +
+                            '🛒 _"Adiciona azeitonas na lista do mercado"_\n' +
+                            '👥 _"Mostre as pessoas do meu grupo"_\n\n' +
+                            'Diga _"Ajuda com grupos"_, _"Ajuda com listas"_, _"Ajuda com relatórios"_ para mais detalhes.';
+                }
+                break;
+
+            // ── Fallback: parser legado (Grupo senha, Grupo nome, etc.) ────────
+            case 'UNKNOWN':
+            default: {
+                if (text) {
+                    try {
+                        const legacyResult = await processMessage(userId, text);
+                        const unknownMsg   = '❌ Não entendi o que você quis dizer.';
+                        if (legacyResult && !String(legacyResult).startsWith(unknownMsg)) {
+                            if (typeof legacyResult === 'object' && legacyResult.type === 'chart') {
+                                const imagePath = await generatePieChartImage(legacyResult.data, 'Gráfico');
+                                const media    = MessageMedia.fromFilePath(imagePath);
+                                await msg.reply(media, undefined, { caption: '📊 Gráfico de Gastos' });
+                                setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 5000);
+                                await msg.react('✅');
+                                return;
+                            }
+                            replyText = String(legacyResult);
+                            break;
+                        }
+                    } catch (e) { /* segue para mensagem padrão */ }
+                }
+                replyText = '🤷‍♂️ Não entendi o que você quis dizer.\n\nTente ser mais específico ou diga _"Ajuda"_ para ver o que posso fazer.';
+                break;
+            }
         }
 
         if (replyText) {
-            appendLog('INFO', userId, `📤 Bot respondeu: "${replyText.substring(0, 50)}..."`);
+            appendLog('INFO', userId, `📤 Resposta: "${replyText.substring(0, 60)}..."`);
             await msg.reply(replyText);
             await msg.react('✅');
         }
 
     } catch (e) {
-        appendLog('ERROR', userId, 'Erro grave na IA', e.message);
+        appendLog('ERROR', userId, 'Erro na IA', e.message);
         await msg.react('❌');
-        await msg.reply('❌ Ops! Falha na conexão com o Google Gemini.');
+        await msg.reply('❌ Ops! Falha ao processar sua mensagem. Tente novamente em instantes.');
     }
 }
 
